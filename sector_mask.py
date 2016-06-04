@@ -19,6 +19,8 @@
 # This code is taken from user 'ali_m' from StackOverflow:
 # <http://stackoverflow.com/questions/18352973/mask-a-circular-sector-in-a-numpy-array>
 
+# test comments
+
 import numpy as np
 
 
