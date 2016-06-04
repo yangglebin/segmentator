@@ -101,16 +101,33 @@ plt.axis('off')
 #
 """Initialisation"""
 # create first instance of sector mask
-shape = (nrBins, nrBins)
+#shape = (nrBins, nrBins)
 centre = (0, 0)
 radius = 200
 theta = (0, 360)
-sectorObj = sector_mask(shape, centre, radius, theta)
+sectorObj = sector_mask(centre, radius, theta[0], theta[1], nrBins)
+# ax.add_artist(sectorObj)
+
+# initialise volHistMask
+volHistMask = np.zeros((nrBins, nrBins),dtype=int)
+
+#test = sectorObj.binaryMask(volHistMask)
 
 # draw sector mask for the first time
-volHistMaskHandle, volHistMask = sectorObj.draw(
-    ax, cmap='Reds', alpha=0.2, vmin=0.1, interpolation='nearest',
-    origin='lower', extent=[percDataMin, percDataMax, gra.min(), percDataMax])
+volHistMaskHandle, volHistMask = sectorObj.newdraw(volHistMask, ax,
+                                                   cmap='Reds', alpha=0.2,
+                                                   vmin=0.1,
+                                                   interpolation='nearest',
+                                                   origin='lower',
+                                                   extent=[percDataMin,
+                                                           percDataMax,
+                                                           gra.min(),
+                                                           percDataMax])
+
+
+## seems to work up until here, now functions need to be adjusted to
+# set_centre
+# set_radius ..
 
 # pass on some properties to sector object
 sectorObj.figure = ax.figure
