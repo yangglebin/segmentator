@@ -206,6 +206,17 @@ axTransp = plt.axes([0.6, bottom-0.11, 0.25, 0.025], axisbg=axcolor)
 flexFig.sImaMaskTrans = Slider(axTransp, 'Transparency', 0, 0.999,
                                valinit=0.5, valfmt='%0.1f')
 
+# undo button
+cycleax = plt.axes([0.15, bottom-0.17, 0.075, 0.075])
+flexFig.bUndo = Button(cycleax, 'Undo',
+                       color=axcolor, hovercolor='0.975')
+
+# redo button
+cycleax = plt.axes([0.23, bottom-0.17, 0.075, 0.075])
+flexFig.bRedo = Button(cycleax, 'Redo',
+                       color=axcolor, hovercolor='0.975')
+
+
 # cycle button
 cycleax = plt.axes([0.55, bottom-0.285, 0.075, 0.075])
 flexFig.bCycle = Button(cycleax, 'Cycle\nView',
@@ -243,6 +254,8 @@ flexFig.bExport.on_clicked(flexFig.exportNifti)
 flexFig.bExportNyp.on_clicked(flexFig.exportNyp)
 flexFig.bReset.on_clicked(flexFig.resetGlobal)
 flexFig.bImaMask.on_clicked(flexFig.imaMaskTransB)
+flexFig.bRedo.on_clicked(flexFig.redo)
+flexFig.bUndo.on_clicked(flexFig.undo)
 flexFig.radio.on_clicked(flexFig.updateLabelsRadio)
 
 plt.show()

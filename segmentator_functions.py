@@ -39,6 +39,12 @@ class responsiveObj:
         self.imaMaskSwitchCount = 0
         self.nrExports = 0
         self.entropWin = 0
+        self.counterFieldHistory = np.empty((self.nrBins, self.nrBins, 20),
+                                            dtype='int')
+        self.VolHistMaskHistory = np.empty((self.nrBins, self.nrBins, 20),
+                                           dtype='int')
+        self.historyCounter = 0
+        self.historyMax = 0
 
     def updateMsks(self):
         """Update volume histogram mask."""
@@ -188,6 +194,27 @@ class responsiveObj:
                     # replace old values with new values (in clicked subfield)
                     self.volHistMask[oLabels == val] = np.copy(
                         nLabels[oLabels == val])
+                    # put copy in history
+
+                    if np.greater(self.historyCounter, 18):
+                        print "history at maximum capacity"
+                        self.counterFieldHistory = np.roll(
+                            self.counterFieldHistory, -1, axis=2)
+                        self.counterFieldHistory[:, :, self.historyCounter] = \
+                            np.copy(self.counterField)
+                        self.VolHistMaskHistory = np.roll(
+                            self.VolHistMaskHistory, -1, axis=2)
+                        self.VolHistMaskHistory[:, :, self.historyCounter] = \
+                            np.copy(self.volHistMask)
+                    else:
+                        self.counterFieldHistory[:, :, self.historyCounter] = \
+                            np.copy(self.counterField)
+                        self.VolHistMaskHistory[:, :, self.historyCounter] = \
+                            np.copy(self.volHistMask)
+                        self.historyCounter += 1
+                    if np.greater(self.historyCounter, self.historyMax):
+                        self.historyMax = np.copy(self.historyCounter)
+                    # update mask
                     self.updateMsks()
 
                 elif event.inaxes == self.axes2:  # cursor in right plot (brow)
@@ -200,7 +227,8 @@ class responsiveObj:
                     ybin = np.floor(event.ydata)
                     val = self.volHistMask[ybin][xbin]
                     # fetch the slider value to get label nr
-                    self.volHistMask[self.volHistMask == val] = np.copy(self.labelNr)
+                    self.volHistMask[self.volHistMask == val] = \
+                        np.copy(self.labelNr)
                     self.updateMsks()
 
     def on_motion(self, event):
@@ -422,3 +450,29 @@ class responsiveObj:
         newArray = array.flatten()
         newArray[lin[indices]] = 1
         return newArray.reshape(array.shape)
+
+    def undo(self, event):
+        print "undo history"
+        self.historyCounter -= 1
+        if np.less(self.historyCounter, 0):
+            print "history was maximally undone"
+        else:
+            self.counterField = self.counterFieldHistory[:, :,
+                                                         self.historyCounter]
+            self.volHistMask = self.VolHistMaskHistory[:, :,
+                                                       self.historyCounter]
+            self.updateMsks()
+
+    def redo(self, event):
+        print "undo history"
+        self.historyCounter += 1
+        if np.greater(self.historyCounter, 19):
+            print "no more is possible1"
+        elif np.greater(self.historyCounter, self.historyMax):
+            print "no more is possible2"
+        else:
+            self.counterField = self.counterFieldHistory[:, :,
+                                                         self.historyCounter]
+            self.volHistMask = self.VolHistMaskHistory[:, :,
+                                                       self.historyCounter]
+            self.updateMsks()
